@@ -702,6 +702,29 @@ Segment appearence depends on var `vc-display-status' and faces like
                             'elfeed-search-unread-count-face)
                 "]")))))
 
+
+;; TODO track time with a timer
+(defvar mini-echo--hammy-segments
+  `(hammy-name
+    ,(lambda (h) (hammy-interval-name (hammy-interval h)))
+    ,(lambda (h) (hammy-interval-duration (hammy-interval h)))))
+
+(defun mini-echo--hammy-status ()
+  (when (bound-and-true-p hammy-active)
+    (mini-echo-segment--print
+     (mapconcat
+      (lambda (h) (mapconcat
+                   (lambda (f) (funcall f h))
+                   mini-echo--hammy-segments " "))
+      hammy-active " "))))
+
+
+(mini-echo-define-segment "hammy"
+  "Return hammy timer status."
+  :update-hook '(hammy-interval-hook)
+  :fetch (mini-echo--hammy-status)
+  :update (mini-echo--hammy-status))
+
 ;; TODO add more segments
 
 (provide 'mini-echo-segments)
